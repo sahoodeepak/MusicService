@@ -37,7 +37,7 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".MusicActivity"
+            android:name=".ListOfSongsActivity"
             android:parentActivityName=".LoginActivity">
 
             <!-- The meta-data tag is required if you support API level 15 and lower -->
@@ -47,10 +47,9 @@
         </activity>
 
         <service
-            android:name=".MusicService">
-            <!--android:enabled="true"-->
-            <!--android:exported="true">-->
-        </service>
+            android:name=".MusicService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

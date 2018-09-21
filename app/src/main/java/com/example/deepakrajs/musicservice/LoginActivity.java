@@ -37,12 +37,12 @@ public class LoginActivity extends AppCompatActivity {
             if (checkIdPassword == false) {
                 Toast.makeText(getBaseContext(), "Incorrect Id or Password", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getBaseContext(), "Login Successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Login Successfully", Toast.LENGTH_LONG).show();
 
                 String button_text;
                 button_text = ((Button) view).getText().toString();
                 if (button_text.equals("Open")) {
-                    Intent intent = new Intent(this, MusicActivity.class); // "MainActivity.this" and "this" both are same
+                    Intent intent = new Intent(this, ListOfSongsActivity.class); // "MainActivity.this" and "this" both are same
                     startActivity(intent);
                 }
 
