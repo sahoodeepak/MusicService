@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
@@ -35,6 +37,8 @@ public class ListOfSongsActivity extends AppCompatActivity {
     String path;
     static String absolutePath, songName;
     public static boolean playing = false;
+    private SeekBar seekBar = null;
+    MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,8 @@ public class ListOfSongsActivity extends AppCompatActivity {
             checkPermission();
         else
             initViews();
+
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
     }
 
 
@@ -127,6 +133,27 @@ public class ListOfSongsActivity extends AppCompatActivity {
                     Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
                     startService(i);
                 }
+            }
+        });
+
+        seekBar.setMax(player.getDuration());
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    player.seekTo(progress);
+                    seekBar.setProgress(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
 
