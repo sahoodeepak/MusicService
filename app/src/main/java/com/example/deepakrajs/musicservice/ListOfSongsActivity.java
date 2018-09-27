@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,8 +18,8 @@ import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
@@ -29,7 +28,7 @@ import java.util.ArrayList;
 public class ListOfSongsActivity extends AppCompatActivity {
 
     ListView listview;
-    Button btnPlayStop;
+    ImageButton btnPlayStop;
     TextView txtSongName;
     CardView cardView;
     ArrayList<SongObject> listOfContents;
@@ -37,8 +36,6 @@ public class ListOfSongsActivity extends AppCompatActivity {
     String path;
     static String absolutePath, songName;
     public static boolean playing = false;
-    private SeekBar seekBar = null;
-    MediaPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +47,12 @@ public class ListOfSongsActivity extends AppCompatActivity {
             checkPermission();
         else
             initViews();
-
-        seekBar = (SeekBar) findViewById(R.id.seekBar);
     }
 
 
     void initViews() {
         //initializing views
-        btnPlayStop = (Button) findViewById(R.id.btnPlayStop);
+        btnPlayStop = (ImageButton) findViewById(R.id.btnPlayStop);
         txtSongName = (TextView) findViewById(R.id.txtSongName);
         cardView = (CardView) findViewById(R.id.cardView);
         listview = (ListView) findViewById(R.id.listView);
@@ -67,7 +62,7 @@ public class ListOfSongsActivity extends AppCompatActivity {
         if (playing) {
             txtSongName.setText(songName);
             cardView.setVisibility(View.VISIBLE);
-            btnPlayStop.setText("Stop");
+            btnPlayStop.setImageResource(android.R.drawable.ic_media_pause);
         }
 
         //Gives you the full path of phone memory
@@ -107,7 +102,7 @@ public class ListOfSongsActivity extends AppCompatActivity {
                 //Get and set the name of song in the player
                 songName = listOfContents.get(position).getFileName();
                 txtSongName.setText(songName);
-                btnPlayStop.setText("Stop");
+                btnPlayStop.setImageResource(android.R.drawable.ic_media_pause);
             }
 
         });
@@ -121,7 +116,7 @@ public class ListOfSongsActivity extends AppCompatActivity {
                     //Stop the song by calling stopService() and change boolean value
                     //text on button should be changed to 'Play'
                     playing = false;
-                    btnPlayStop.setText("Play");
+                    btnPlayStop.setImageResource(android.R.drawable.ic_media_play);
                     Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
                     stopService(i);
                 } else if (!playing) {
@@ -129,31 +124,10 @@ public class ListOfSongsActivity extends AppCompatActivity {
                     //Start the song by calling startService() and change boolean value
                     //text on button should be changed to 'Stop'
                     playing = true;
-                    btnPlayStop.setText("Stop");
+                    btnPlayStop.setImageResource(android.R.drawable.ic_media_pause);
                     Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
                     startService(i);
                 }
-            }
-        });
-
-        seekBar.setMax(player.getDuration());
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    player.seekTo(progress);
-                    seekBar.setProgress(progress);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
 
@@ -193,6 +167,7 @@ public class ListOfSongsActivity extends AppCompatActivity {
         }
     }
 
+    //Popups for the permissions request to allow or deny
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
