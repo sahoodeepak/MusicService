@@ -37,19 +37,19 @@
                 android:background="@color/colorPrimary"
                 android:id="@+id/btnPlayStop"
                 android:gravity="center"/>-->
-            <!--<SeekBar
+            <SeekBar
                 android:id="@+id/seekBar"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
-                android:paddingBottom="10dp" />-->
+                android:paddingBottom="10dp" />
 
-            <!--<ImageButton
+            <ImageButton
                 android:id="@+id/previous"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@android:drawable/ic_media_previous" />-->
+                android:src="@android:drawable/ic_media_previous" />
             <ImageButton
                 android:id="@+id/btnPlayStop"
                 android:layout_width="wrap_content"
@@ -57,12 +57,12 @@
                 android:layout_gravity="center_horizontal"
                 android:src="@android:drawable/ic_media_play" />
 
-           <!-- <ImageButton
+            <ImageButton
                 android:id="@+id/next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@android:drawable/ic_media_next" />-->
+                android:src="@android:drawable/ic_media_next" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
     <!--This is the list view showing list of songs-->

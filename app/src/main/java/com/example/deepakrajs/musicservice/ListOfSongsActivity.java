@@ -2,13 +2,17 @@ package com.example.deepakrajs.musicservice;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
@@ -34,8 +39,18 @@ public class ListOfSongsActivity extends AppCompatActivity {
     ArrayList<SongObject> listOfContents;
     AdapterClass adapter;
     String path;
+    private static final int UPDATE_FREQUENCY = 500;
     static String absolutePath, songName;
     public static boolean playing = false;
+
+    private Intent intent;
+
+    private SeekBar seekBar = null;
+    private ImageButton prev = null;
+    private ImageButton next = null;
+
+    private final Handler handler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +64,41 @@ public class ListOfSongsActivity extends AppCompatActivity {
             initViews();
     }
 
+    public void layout(int duration) {
+        seekBar.setMax(duration);
+        btnPlayStop.setImageResource(android.R.drawable.ic_media_pause);
+        updatePosition();
+        playing = true;
+    }
+
+    private final Runnable updatePositinRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updatePosition();
+        }
+    };
+
+    private void updatePosition() {
+        handler.removeCallbacks(updatePositinRunnable);
+        seekBar.setProgress(musicSrv.getCurrentDuration());
+        handler.postDelayed(updatePositinRunnable, UPDATE_FREQUENCY);
+    }
 
     void initViews() {
+        //Play the selected song by starting the service
+        Intent start = new Intent(ListOfSongsActivity.this, MusicService.class);
+        startService(start);
+
+        bindService(start,musicConnection,BIND_AUTO_CREATE);
+
         //initializing views
         btnPlayStop = (ImageButton) findViewById(R.id.btnPlayStop);
         txtSongName = (TextView) findViewById(R.id.txtSongName);
         cardView = (CardView) findViewById(R.id.cardView);
         listview = (ListView) findViewById(R.id.listView);
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        prev = (ImageButton) findViewById(R.id.previous);
+        next = (ImageButton) findViewById(R.id.next);
         listOfContents = new ArrayList<>();
 
         //If music is playing already on starting the app, player should be visible with Stop button
@@ -83,13 +126,13 @@ public class ListOfSongsActivity extends AppCompatActivity {
                 //player is visible
                 cardView.setVisibility(View.VISIBLE);
 
-                //If some other song is already playing, stop the service
+                /*//If some other song is already playing, stop the service
                 if (playing) {
                     Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
                     stopService(i);
                 }
 
-                playing = true;
+                playing = true;*/
 
                 //getting absolute path of selected song from bean class 'SongObject'
                 SongObject sdOb = listOfContents.get(position);
@@ -102,7 +145,7 @@ public class ListOfSongsActivity extends AppCompatActivity {
                 //Get and set the name of song in the player
                 songName = listOfContents.get(position).getFileName();
                 txtSongName.setText(songName);
-                btnPlayStop.setImageResource(android.R.drawable.ic_media_pause);
+                btnPlayStop.setImageResource(android.R.drawable.ic_media_play);
             }
 
         });
@@ -117,21 +160,65 @@ public class ListOfSongsActivity extends AppCompatActivity {
                     //text on button should be changed to 'Play'
                     playing = false;
                     btnPlayStop.setImageResource(android.R.drawable.ic_media_play);
-                    Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
-                    stopService(i);
+//                    Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
+//                    stopService(i);
+                    musicSrv.stop();
                 } else if (!playing) {
                     //If song is not playing and user clicks on Play button
                     //Start the song by calling startService() and change boolean value
                     //text on button should be changed to 'Stop'
                     playing = true;
                     btnPlayStop.setImageResource(android.R.drawable.ic_media_pause);
-                    Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
-                    startService(i);
+//                    Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
+//                    startService(i);
+                    txtSongName.setText(songName);
+                    seekBar.setProgress(0);
+                    musicSrv.startPlay(absolutePath);
                 }
             }
         });
 
+        // forward and backward implementation
+        // fast forward by clicking on next button
+        next.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                musicSrv.next();
+            }
+        });
+
+        // fast backword by clicking on prev button
+        prev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                musicSrv.prev();
+            }
+        });
     }
+
+    private MusicService musicSrv;
+    private Intent playIntent;
+    private boolean musicBound=false;
+    //private ArrayList<Song> songList;
+    private ServiceConnection musicConnection = new ServiceConnection(){
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.MusicBinder binder = (MusicService.MusicBinder)service;
+            //get service
+            musicSrv = binder.getService();
+            musicSrv.list = ListOfSongsActivity.this;
+            //pass list
+            //musicSrv.setList(songList);
+            musicBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicBound = false;
+        }
+    };
 
     //Fetching .mp3 and .mp4 files from phone storage
     void initList(String path) {
