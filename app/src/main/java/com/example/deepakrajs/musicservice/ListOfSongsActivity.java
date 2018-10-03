@@ -126,14 +126,6 @@ public class ListOfSongsActivity extends AppCompatActivity {
                 //player is visible
                 cardView.setVisibility(View.VISIBLE);
 
-                /*//If some other song is already playing, stop the service
-                if (playing) {
-                    Intent i = new Intent(ListOfSongsActivity.this, MusicService.class);
-                    stopService(i);
-                }
-
-                playing = true;*/
-
                 //getting absolute path of selected song from bean class 'SongObject'
                 SongObject sdOb = listOfContents.get(position);
                 absolutePath = sdOb.getAbsolutePath();
@@ -145,7 +137,8 @@ public class ListOfSongsActivity extends AppCompatActivity {
                 //Get and set the name of song in the player
                 songName = listOfContents.get(position).getFileName();
                 txtSongName.setText(songName);
-                btnPlayStop.setImageResource(android.R.drawable.ic_media_play);
+                musicSrv.startPlay(absolutePath);
+                btnPlayStop.setImageResource(android.R.drawable.ic_media_pause);
             }
 
         });
