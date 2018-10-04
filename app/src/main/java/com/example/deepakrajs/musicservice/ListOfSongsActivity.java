@@ -71,6 +71,10 @@ public class ListOfSongsActivity extends AppCompatActivity {
         playing = true;
     }
 
+    public int onSeekProgress() {
+        return seekBar.getProgress();
+    }
+
     private final Runnable updatePositinRunnable = new Runnable() {
         @Override
         public void run() {
@@ -186,6 +190,24 @@ public class ListOfSongsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 musicSrv.prev();
+            }
+        });
+
+        //seekbar, forwarding and backwarding by seekbar
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                musicSrv.seekBarProgress();
             }
         });
     }

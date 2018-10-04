@@ -66,7 +66,10 @@ public class MusicService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void seekBarProgress() {
+        mediaPlayer.seekTo(list.onSeekProgress());
     }
 
     public void stop() {
